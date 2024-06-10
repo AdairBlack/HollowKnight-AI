@@ -13,8 +13,10 @@ class WindowController():
         """
         find the location of Hollow Knight window
 
+        Parameters:
+
         Returns:
-            monitor: to get screenshot
+        window: the location of the window
         """
 
         windows = pyautogui.getWindowsWithTitle('Hollow Knight')
