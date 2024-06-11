@@ -13,9 +13,6 @@ class WindowController():
         """
         find the location of Hollow Knight window
 
-        Parameters:
-
-        Returns:
         window: the location of the window
         """
 
@@ -29,3 +26,19 @@ class WindowController():
         window = windows[0]
 
         return window
+
+    def _find_menu(self):
+        """
+        locate the menu badge,
+        when the badge is found, the correct game is ready to be started
+
+        :return: the location of menu badge
+        """
+        monitor = self.monitor
+        monitor = (monitor['left'] + monitor['width'] // 2,
+                   monitor['top'] + monitor['height'] // 4,
+                   monitor['width'] // 2,
+                   monitor['height'] // 2)
+        return pyautogui.locateOnScreen(f'locator/menu_badge.png',
+                                        region=monitor,
+                                        confidence=0.925)
