@@ -65,7 +65,8 @@ class Trainer:
         logger.info(f'Start Trainer: {self.name}')
         total_steps = 0
         total_episodes = 0
-        last_episode_steps = 0
+        last_episode_total_steps = 0
+        eval_steps_count = 0
         while total_episodes < self.max_train_episodes:
             s, info = self.env.reset(seed=self.env_seed)
             self.env_seed += 1
@@ -88,32 +89,36 @@ class Trainer:
                 total_steps += 1
 
             total_episodes += 1
+            this_episode_total_steps = total_steps - last_episode_total_steps
+            eval_steps_count += this_episode_total_steps
             '''train'''
             if (total_steps >= 2*self.max_e_steps):
                 logger.info(
-                    f"Train at episode {total_episodes}, steps: {total_steps}")
-                for j in range(total_steps - last_episode_steps):
+                    f"Train at episode {total_episodes}, steps: {total_steps}, train times: {this_episode_total_steps}")
+                for j in range(this_episode_total_steps):
                     self.agent.train()
 
             ep_r = 0
             '''record & log'''
-            if total_episodes % self.eval_interval == 0:
+            if eval_steps_count >= self.eval_interval:
                 logger.info(
                     f'Evaluate at episode {total_episodes}, steps: {total_steps}')
                 ep_r = evaluate_policy(self.eval_env, self.agent, turns=3)
                 if self.write:
                     self.writer.add_scalar(
                         'ep_r', ep_r, global_step=total_steps)
+                eval_steps_count = 0
 
             '''save model'''
             if total_episodes % self.save_interval == 0:
-                logger.info(f"Save model at episode {total_episodes}")
+                logger.info(
+                    f"Save model at episode {total_episodes}, steps: {total_steps}")
                 self.agent.save(self.name, int(total_steps/1000))
 
             logger.info(
                 f'EnvName:{self.name}, Episode: {total_episodes}, Steps: {int(total_steps/1000)}k, Episode Reward:{ep_r}')
 
-            last_episode_steps = total_steps - last_episode_steps
+            last_episode_total_steps = total_steps
 
         logger.info(f'End Trainer: {self.name}')
 

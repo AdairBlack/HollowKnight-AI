@@ -32,8 +32,8 @@ parser.add_argument('--max_train_episodes', type=int,
                     default=int(1e3), help='Max training episodes')
 parser.add_argument('--save_interval', type=int,
                     default=int(25), help='Model saving interval, in episodes.')
-parser.add_argument('--eval_interval', type=int, default=int(25),
-                    help='Model evaluating interval, in episodes.')
+parser.add_argument('--eval_interval', type=int, default=int(2.5e3),
+                    help='Model evaluating interval, in steps.')
 
 # some hyperparameters for SAC
 parser.add_argument('--gamma', type=float, default=0.99,

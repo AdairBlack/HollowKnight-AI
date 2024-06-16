@@ -1,4 +1,4 @@
-from datetime import time
+import time
 from utils import Actor, Double_Q_Critic
 import torch.nn.functional as F
 import numpy as np
@@ -112,9 +112,9 @@ class SacCountinuous():
     def save(self, env_name, steps_done):
         timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
         torch.save(self.actor.state_dict(),
-                   f"./model/{env_name}-{steps_done}-actor-{timestamp}.pth")
+                   f"./model/{env_name}-{steps_done}k-actor-{timestamp}.pth")
         torch.save(self.q_critic.state_dict(),
-                   f"./model/{env_name}-{steps_done}-q-critic-{timestamp}.pth")
+                   f"./model/{env_name}-{steps_done}k-q-critic-{timestamp}.pth")
 
     def load(self, actor_file_name, critic_file_name):
         self.actor.load_state_dict(torch.load(
