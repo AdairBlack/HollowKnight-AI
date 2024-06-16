@@ -90,12 +90,16 @@ class Trainer:
             total_episodes += 1
             '''train'''
             if (total_steps >= 2*self.max_e_steps):
+                logger.info(
+                    f"Train at episode {total_episodes}, steps: {total_steps}")
                 for j in range(total_steps - last_episode_steps):
                     self.agent.train()
 
             ep_r = 0
             '''record & log'''
             if total_episodes % self.eval_interval == 0:
+                logger.info(
+                    f'Evaluate at episode {total_episodes}, steps: {total_steps}')
                 ep_r = evaluate_policy(self.eval_env, self.agent, turns=3)
                 if self.write:
                     self.writer.add_scalar(
@@ -103,6 +107,7 @@ class Trainer:
 
             '''save model'''
             if total_episodes % self.save_interval == 0:
+                logger.info(f"Save model at episode {total_episodes}")
                 self.agent.save(self.name, int(total_steps/1000))
 
             logger.info(
