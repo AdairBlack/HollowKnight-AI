@@ -94,7 +94,7 @@ class Trainer:
             '''train'''
             if (total_steps >= 2*self.max_e_steps):
                 logger.info(
-                    f"Train at episode {total_episodes}, steps: {total_steps}, train times: {this_episode_total_steps}")
+                    f"Train at episode {total_episodes}, total steps: {total_steps}, train times: {this_episode_total_steps}")
                 for j in range(this_episode_total_steps):
                     self.agent.train()
 
