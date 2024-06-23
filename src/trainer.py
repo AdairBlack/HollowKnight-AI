@@ -22,6 +22,7 @@ class Trainer:
         self.save_interval = save_interval
         self.eval_interval = eval_interval
         self.write = write
+        self.load_model = load_model
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.shape[0]
         self.max_action = float(env.action_space.high[0])
@@ -54,12 +55,14 @@ class Trainer:
             dvc=dvc, adaptive_alpha=adaptive_alpha)
 
         if (load_model):
-            actor_model_file_path = f'model/{actor_model_file}.pth'
-            critic_model_file_path = f'model/{critic_model_file}.pth'
+            actor_model_file_path = f'./model/{actor_model_file}.pth'
+            critic_model_file_path = f'./model/{critic_model_file}.pth'
+            logger.info(
+                f'Load model from {actor_model_file_path} and {critic_model_file_path}')
             if not os.path.exists(actor_model_file_path) or not os.path.exists(critic_model_file_path):
                 logger.error('No such model file')
                 raise FileNotFoundError
-            self.agent.load(actor_model_file, critic_model_file)
+            self.agent.load(actor_model_file_path, critic_model_file_path)
 
     def start(self):
         logger.info(f'Start Trainer: {self.name}')
@@ -92,7 +95,7 @@ class Trainer:
             this_episode_total_steps = total_steps - last_episode_total_steps
             eval_steps_count += this_episode_total_steps
             '''train'''
-            if (total_steps >= 2*self.max_e_steps):
+            if (total_steps >= 2*self.max_e_steps or self.load_model):
                 logger.info(
                     f"Train at episode {total_episodes}, total steps: {total_steps}, train times: {this_episode_total_steps}")
                 for j in range(this_episode_total_steps):

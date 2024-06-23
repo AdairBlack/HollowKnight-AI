@@ -8,6 +8,9 @@ import pyautogui
 import threading
 import numpy as np
 from mss.windows import MSS as mss
+import logging
+
+logger = logging.getLogger(__name__)
 
 pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0.
