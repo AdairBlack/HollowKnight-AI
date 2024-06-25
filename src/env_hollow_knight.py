@@ -268,7 +268,7 @@ class HKEnv(gym.Env):
         action_rew += self._step_actions(actions)
         obs, knight_hp, enemy_hp = self.observe()
 
-        win = self.prev_enemy_hp < enemy_hp
+        win = enemy_hp == 0
         lose = knight_hp == 0
         done = win or lose
 
@@ -290,8 +290,6 @@ class HKEnv(gym.Env):
             reward += knight_hp / 40. + time_rew
         elif lose:
             reward -= enemy_hp / 5.
-        # print('reward', reward)
-        # print()
 
         self.prev_knight_hp = knight_hp
         self.prev_enemy_hp = enemy_hp

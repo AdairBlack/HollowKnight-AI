@@ -64,6 +64,10 @@ class Trainer:
                 raise FileNotFoundError
             self.agent.load(actor_model_file_path, critic_model_file_path)
 
+    @staticmethod
+    def _process_frames(frames):
+        return tuple(frames)
+
     def start(self):
         logger.info(f'Start Trainer: {self.name}')
         total_steps = 0
