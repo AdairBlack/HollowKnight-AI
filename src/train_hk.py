@@ -4,8 +4,9 @@ from torch.backends import cudnn
 
 import env_hollow_knight
 import models
-import trainer
+import trainer_dqn as trainer
 import buffer
+import logging
 
 DEVICE = 'cuda'
 cudnn.benchmark = True
@@ -21,7 +22,7 @@ def get_model(env: gym.Env, n_frames: int):
 
 
 def train(dqn):
-    print('training started')
+    logger.info('training started')
     dqn.save_explorations(75)
     dqn.load_explorations()
     # raise ValueError
@@ -30,10 +31,10 @@ def train(dqn):
     saved_rew = float('-inf')
     saved_train_rew = float('-inf')
     for i in range(1, 501):
-        print('episode', i)
+        logger.info('episode', i)
         rew, loss, lr = dqn.run_episode()
         if rew > saved_train_rew and dqn.eps < 0.11:
-            print('new best train model found')
+            logger.info('new best train model found')
             saved_train_rew = rew
             dqn.save_models('besttrain')
         if i % 10 == 0:
@@ -42,19 +43,19 @@ def train(dqn):
                 eval_rew = dqn.evaluate()
 
                 if eval_rew > saved_rew:
-                    print('new best eval model found')
+                    logger.info('new best eval model found')
                     saved_rew = eval_rew
                     dqn.save_models('best')
         dqn.save_models('latest')
 
         dqn.log({'reward': rew, 'loss': loss}, i)
-        print(f'episode {i} finished, total step {dqn.steps}, learned {dqn.learn_steps}, epsilon {dqn.eps}',
-              f'total rewards {round(rew, 3)}, loss {round(loss, 3)}, current lr {round(lr, 8)}', sep='\n')
-        print()
+        logger.info(f'episode {i} finished, total step {dqn.steps}, learned {dqn.learn_steps}, epsilon {dqn.eps}',
+                    f'total rewards {round(rew, 3)}, loss {round(loss, 3)}, current lr {round(lr, 8)}', sep='\n')
+        logger.info()
 
 
 def main():
-
+    logging.basicConfig(level=logging.DEBUG)
     logger.info('Start training hollow knight AI')
 
     n_frames = 4

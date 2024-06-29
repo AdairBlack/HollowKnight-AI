@@ -136,6 +136,7 @@ class EnvHollowKnight(gym.Env):
         while geo is None:
             geo = pyautogui.locateOnScreen('./locator/geo.png',
                                            confidence=conf)
+            logger.debug(f'geo confidence: {conf}')
             conf = max(0.92, conf * 0.999)
             time.sleep(0.1)
         loc = {
@@ -305,20 +306,24 @@ class EnvHollowKnight(gym.Env):
 
         self.prev_knight_hp = knight_hp
         self.prev_enemy_hp = enemy_hp
-        logger.debug(f'step() reward: {reward}')
+        logger.debug(f'reward: {reward}')
         reward = np.clip(reward, -1.5, 1.5)
-        logger.debug(f'step() reward clipped: {reward}')
+        logger.debug(f'reward clipped: {reward}')
+        logger.debug(f'win: {win}')
         logger.debug(
             f'done: {done}, knight_hp: {knight_hp}, enemy_hp: {enemy_hp}')
         return obs, reward, done, False, None
 
     def reset(self, seed=None, options=None):
         logger.info('reset()')
-        super(HKEnv, self).reset(seed=seed)
+        super(EnvHollowKnight, self).reset(seed=seed)
         self.cleanup()
         while True:
-            if self._find_menu():
-                break
+            try:
+                if self._find_menu():
+                    break
+            except Exception as e:
+                logger.error(f"Error finding menu: {e}")
             pyautogui.press('w')
             time.sleep(0.75)
         pyautogui.press('space')
