@@ -30,7 +30,7 @@ def train(dqn):
 
     saved_rew = float('-inf')
     saved_train_rew = float('-inf')
-    for i in range(1, 501):
+    for i in range(1, 5):
         logger.info('episode', i)
         rew, loss, lr = dqn.run_episode()
         if rew > saved_train_rew and dqn.eps < 0.11:
@@ -51,7 +51,6 @@ def train(dqn):
         dqn.log({'reward': rew, 'loss': loss}, i)
         logger.info(f'episode {i} finished, total step {dqn.steps}, learned {dqn.learn_steps}, epsilon {dqn.eps}',
                     f'total rewards {round(rew, 3)}, loss {round(loss, 3)}, current lr {round(lr, 8)}', sep='\n')
-        logger.info()
 
 
 def main():
