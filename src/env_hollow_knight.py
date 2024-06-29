@@ -44,7 +44,7 @@ class Displacement(Actions):
     # DASH = 3
 
 
-class HKEnv(gym.Env):
+class EnvHollowKnight(gym.Env):
     """
     environment that interacts with Hollow knight game,
     implementation follows the gym custom environment API
@@ -87,6 +87,8 @@ class HKEnv(gym.Env):
         :param w3: the weight of positive reward when not hitting nor being hit
                 (for example, w3=-0.0001 means give -0.0001 reward when neither happens
         """
+        logger.info('Hollow Knight environment is being loaded')
+
         self.monitor = self._find_window()
         self.holding = []
         self.prev_knight_hp = None
@@ -116,6 +118,7 @@ class HKEnv(gym.Env):
 
         :return: return the monitor location for screenshot
         """
+        logger.info('Finding Hollow Knight window')
         window = pyautogui.getWindowsWithTitle('Hollow Knight')
         assert len(
             window) == 1, f'found {len(window)} windows called Hollow Knight {window}'
@@ -152,6 +155,7 @@ class HKEnv(gym.Env):
         :param seconds: time to hold the key
         :return: 1 if already holding, 0 when success
         """
+        logger.debug(f'holding {key} for {seconds} seconds')
 
         def timer_thread():
             pyautogui.keyDown(key)
@@ -176,6 +180,7 @@ class HKEnv(gym.Env):
         :param actions: a list of actions
         :return: reward for doing given actions
         """
+        logger.debug(f'_step_actions actions: {actions}')
         for key in self.holding:
             pyautogui.keyUp(key)
         self.holding = []
@@ -205,11 +210,13 @@ class HKEnv(gym.Env):
         :param num: the number representing an action combination
         :return: list of action enums
         """
+        logger.debug(f'_to_multi_discrete num: {num}')
         num = int(num)
         chosen = []
         for Act in self.ACTIONS:
             num, mod = divmod(num, len(Act))
             chosen.append(Act(mod))
+        logger.debug(f'_to_multi_discrete chosen: {chosen}')
         return chosen
 
     def _find_menu(self):
@@ -219,6 +226,7 @@ class HKEnv(gym.Env):
 
         :return: the location of menu badge
         """
+        logger.info('Finding menu badge')
         monitor = self.monitor
         monitor = (monitor['left'] + monitor['width'] // 2,
                    monitor['top'] + monitor['height'] // 4,
@@ -235,6 +243,7 @@ class HKEnv(gym.Env):
         :param force_gray: override self.rgb to force return gray obs
         :return: observation (a resized screenshot), knight HP, and enemy HP
         """
+        logger.debug('observing')
         with mss() as sct:
             frame = np.asarray(sct.grab(self.monitor), dtype=np.uint8)
         enemy_hp_bar = frame[-1, 187:826, :]
@@ -257,9 +266,12 @@ class HKEnv(gym.Env):
                          interpolation=cv2.INTER_AREA)
         # make channel first
         obs = np.rollaxis(obs, -1) if rgb else obs[np.newaxis, ...]
+        logger.debug(f'observed knight_hp: {knight_hp}, enemy_hp: {enemy_hp}')
         return obs, knight_hp, enemy_hp
 
     def step(self, actions):
+        logger.debug(f'step()')
+        logger.debug(f'actions: {actions}')
         action_rew = 0
         if actions == self.prev_action:
             action_rew -= 2e-5
@@ -293,10 +305,15 @@ class HKEnv(gym.Env):
 
         self.prev_knight_hp = knight_hp
         self.prev_enemy_hp = enemy_hp
+        logger.debug(f'step() reward: {reward}')
         reward = np.clip(reward, -1.5, 1.5)
+        logger.debug(f'step() reward clipped: {reward}')
+        logger.debug(
+            f'done: {done}, knight_hp: {knight_hp}, enemy_hp: {enemy_hp}')
         return obs, reward, done, False, None
 
     def reset(self, seed=None, options=None):
+        logger.info('reset()')
         super(HKEnv, self).reset(seed=seed)
         self.cleanup()
         while True:
@@ -328,7 +345,7 @@ class HKEnv(gym.Env):
         do any necessary cleanup on the interaction
         should only be called before or after an episode
         """
-
+        logger.info('cleanup()')
         if self._timer is not None:
             self._timer.join()
         self.holding = []
