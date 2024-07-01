@@ -7,6 +7,10 @@ import numpy as np
 from collections import deque
 from kornia import augmentation as K
 from torch.utils.tensorboard import SummaryWriter
+import inspect
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Trainer:
@@ -389,6 +393,9 @@ class Trainer:
         :param n_episodes: number of explorations to be saved
         :param save_loc: directory used to save
         """
+        # log function name
+        logger.info(f"{inspect.currentframe().f_code.co_name}()")
+        logger.info(f"save_explorations({n_episodes}, {save_loc})")
         assert not save_loc.endswith('\\')
         save_loc = save_loc if save_loc.endswith('/') else f'{save_loc}/'
         for i in range(n_episodes):

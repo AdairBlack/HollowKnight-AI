@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_model(env: gym.Env, n_frames: int):
+    logger.info("get_model()")
     c, *shape = env.observation_space.shape
     m = models.SimpleExtractor(shape, n_frames * c)
     m = models.DuelingMLP(m, env.action_space.n, noisy=True, sn=False)
